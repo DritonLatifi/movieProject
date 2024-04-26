@@ -1,21 +1,21 @@
 "use client"
 
-import Category from "@/components/category";
-import Footer from "@/components/footer";
-import Toggle from "@/components/toggle";
-import Rating from "@/components/rating";
-import Genre from "@/components/genre";
-import Slider from "@/components/slider";
+import Category from "@/components/category"
+import Footer from "@/components/footer"
+import Toggle from "@/components/toggle"
+import Rating from "@/components/rating"
+import Genre from "@/components/genre"
+import Slider from "@/components/slider"
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react"
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"
 
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"
+import Link from "next/link"
 
-import { FaClock } from "react-icons/fa6";
-import { useSearchParams } from "next/navigation";
+import { FaClock } from "react-icons/fa6"
+import { useSearchParams } from "next/navigation"
 
 
 export default function Home() {
@@ -31,31 +31,37 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-      await fetch('https://api.themoviedb.org/3/authentication/session/new', {
-        method: 'POST',
-        headers: {
-          Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY,
-          accept: 'application/json',
-          'content-type': 'application/json'
-        },
-        body: JSON.stringify({ request_token: searchParams.get('request_token') })
-      }).then(res => res.json()).then(async data => {
-        await fetch(`https://api.themoviedb.org/3/account/account_id?session_id=${data.session_id}`, {
-          method: 'GET',
+      if ("serviceWorker" in navigator) await navigator.serviceWorker.register("/sw.js")
+
+      if (navigator.onLine && searchParams.get('request_token')) {
+        await fetch('https://api.themoviedb.org/3/authentication/session/new', {
+          method: 'POST',
           headers: {
+            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY,
             accept: 'application/json',
-            Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY
-          }
-        }).then(res => res.json()).then(session => {
-          window.localStorage.setItem('userID', session.id)
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({ request_token: searchParams.get('request_token') })
+        }).then(res => res.json()).then(async data => {
+          await fetch(`https://api.themoviedb.org/3/account/account_id?session_id=${data.session_id}`, {
+            method: 'GET',
+            headers: {
+              accept: 'application/json',
+              Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY
+            }
+          }).then(res => res.json()).then(session => {
+            window.localStorage.setItem('userID', session.id)
+          })
         })
-      })
+      }
 
       const popularRes = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=d61d03c4897622853f09d1e0b7a41c5b&page=1`, { cache: "force-cache" })
       const popularData = await popularRes.json()
 
       const trendingRes = await fetch(`https://api.themoviedb.org/3/trending/movie/day?language=en-US&api_key=d61d03c4897622853f09d1e0b7a41c5b`, { cache: "force-cache" })
       const trendingData = await trendingRes.json()
+
+      console.log(trendingData);
 
       // Descendingly sort the higher rated movies
       popularData.results.sort((a, b) => b.vote_average - a.vote_average)
@@ -89,7 +95,7 @@ export default function Home() {
             <div ref={searchRef} className="absolute flex flex-col w-fit mt-7 bg-black transition-all duration-1000 text-white overflow-y-scroll overflow-x-hidden">
               {searchResult.map((movie) => {
                 return (
-                  <Link href={`/${movie?.id}`} key={movie?.id} className="flex gap-2 h-40">
+                  <Link href={navigator.onLine ? `/${movie?.id}` : '/'} key={movie?.id} className="flex gap-2 h-40">
                     <Image src={`https://image.tmdb.org/t/p/original/${movie?.poster_path}`} height={100} width={120} className="rounded-md object-cover" alt="movie" />
                     <div className="flex flex-col justify-evenly w-3/4">
                       <h2 className="font-bold">{movie?.title}</h2>
@@ -152,5 +158,5 @@ export default function Home() {
       </main>
       <Footer page={'home'} />
     </div>
-  );
+  )
 }

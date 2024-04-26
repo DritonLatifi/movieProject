@@ -90,9 +90,9 @@ export default function Home({ params }) {
             </header>
             <main>
                 {<iframe loading="lazy" allowFullScreen className="w-full h-[40vh]"
-                    src={trailer[0]
+                    src={!trailer[0]
                         ? `https://www.youtube.com/embed/${trailer[0].key}`
-                        : 'https://static.vecteezy.com/system/resources/thumbnails/022/919/535/original/animated-404-error-page-template-hot-air-balloons-in-the-sky-404-error-page-or-file-not-found-concept-video.jpg'}>
+                        : '/placeholder-video.jpg'}>
                 </iframe>}
                 <article ref={ref} className="absolute top-1/3 w-full bg-white rounded-lg p-10 flex flex-col gap-6">
                     <article className="flex justify-between">

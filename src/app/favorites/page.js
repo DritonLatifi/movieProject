@@ -17,7 +17,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 export default function Home() {
     const router = useRouter()
     const searchParams = useSearchParams()
-    console.log(searchParams.get('userID'));
+
     if (searchParams.get('userID') == 'null' || searchParams.get('userID') == 'undefined') router.push('/login') 
 
     const [favorites, setFavorites] = useState([])

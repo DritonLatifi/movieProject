@@ -14,10 +14,9 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 import { FaArrowLeft, FaBookmark, FaRegBookmark } from "react-icons/fa6"
+import { useRouter, useSearchParams } from "next/navigation"
 
 export default function Home({ params }) {
-    if (!window.localStorage.getItem('userID')) window.location.href = '/login' 
-
     const bookmarkRef = useRef(null)
     const ref = useRef(null)
 
@@ -27,6 +26,9 @@ export default function Home({ params }) {
     const [movie, setMovie] = useState({})
     const [trailer, setTrailer] = useState([])
     const [cast, setCast] = useState([])
+
+    const router = useRouter()
+    const searchParams = useSearchParams()
 
     useEffect(() => {
         (async () => {
@@ -40,13 +42,13 @@ export default function Home({ params }) {
                 if (obj.id == params.id) setBookmarked(true)
             }))
 
-            const movieRes = await fetch(`https://api.themoviedb.org/3/movie/${params.id}?language=en-US&api_key=d61d03c4897622853f09d1e0b7a41c5b`, { cache: "force-cache" })
+            const movieRes = await fetch(`https://api.themoviedb.org/3/movie/${params.id}?language=en-US&api_key=d61d03c4897622853f09d1e0b7a41c5b`)
             const movieData = await movieRes.json()
 
-            const trailerRes = await fetch(`https://api.themoviedb.org/3/movie/${params.id}/videos?language=en-US&api_key=d61d03c4897622853f09d1e0b7a41c5b`, { cache: "force-cache" })
+            const trailerRes = await fetch(`https://api.themoviedb.org/3/movie/${params.id}/videos?language=en-US&api_key=d61d03c4897622853f09d1e0b7a41c5b`)
             const trailerData = await trailerRes.json()
 
-            const castRes = await fetch(`https://api.themoviedb.org/3/movie/${params.id}?api_key=d61d03c4897622853f09d1e0b7a41c5b&language=en-US&append_to_response=credits`, { cache: "force-cache" })
+            const castRes = await fetch(`https://api.themoviedb.org/3/movie/${params.id}?api_key=d61d03c4897622853f09d1e0b7a41c5b&language=en-US&append_to_response=credits`)
             const castData = await castRes.json()
 
             setMovie(movieData)
@@ -57,7 +59,7 @@ export default function Home({ params }) {
 
     function bookmarkHandler() {
         (async () => {
-            await fetch(`https://api.themoviedb.org/3/account/${window.localStorage.getItem('userID')}/favorite`, {
+            await fetch(`https://api.themoviedb.org/3/account/${searchParams.get('userID')}/favorite`, {
                 method: 'POST',
                 headers: {
                     accept: 'application/json',
@@ -83,14 +85,17 @@ export default function Home({ params }) {
     return (
         <>
             <header className="absolute flex justify-between items-center h-[20%] w-full px-6">
-                <Link className="text-white" href="/">
+                <div className="text-white" onClick={() => {
+                    console.log('t');
+                    router.back()
+                }}>
                     <FaArrowLeft size={30} />
-                </Link>
+                </div>
                 {ref.current && <Toggle element={ref.current} />}
             </header>
             <main>
                 {<iframe loading="lazy" allowFullScreen className="w-full h-[40vh]"
-                    src={!trailer[0]
+                    src={trailer[0]
                         ? `https://www.youtube.com/embed/${trailer[0].key}`
                         : '/placeholder-video.jpg'}>
                 </iframe>}

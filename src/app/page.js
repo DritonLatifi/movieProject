@@ -27,7 +27,6 @@ export default function Home() {
   const searchRef = useRef(null)
 
   const searchParams = useSearchParams()
-  const router = useRouter()
 
   useEffect(() => {
     (async () => {
@@ -61,8 +60,6 @@ export default function Home() {
       const trendingRes = await fetch(`https://api.themoviedb.org/3/trending/movie/day?language=en-US&api_key=d61d03c4897622853f09d1e0b7a41c5b`, { cache: "force-cache" })
       const trendingData = await trendingRes.json()
 
-      console.log(trendingData);
-
       // Descendingly sort the higher rated movies
       popularData.results.sort((a, b) => b.vote_average - a.vote_average)
 
@@ -82,20 +79,16 @@ export default function Home() {
     setSearchResult(data.results)
   }
 
-  function redirectHandler(e) {
-    if (e.code == 'Enter') router.push('http://localhost:3000/browse?query=' + e.target.value)
-  }
-
   return (
     <div ref={ref} className="bg-white">
       <header className="h-[100px] mb-2">
         <div className="flex justify-between h-full items-center w-full px-6 float-right">
           <div className="relative flex flex-col w-fit">
-            <input type="search" onChange={changeHandler} onKeyUp={redirectHandler} className="bg-inherit w-full" placeholder="Fight Club.."></input>
+            <input type="search" onChange={changeHandler} className="bg-inherit w-full" placeholder="Fight Club.."></input>
             <div ref={searchRef} className="absolute flex flex-col w-fit mt-7 bg-black transition-all duration-1000 text-white overflow-y-scroll overflow-x-hidden">
               {searchResult.map((movie) => {
                 return (
-                  <Link href={navigator.onLine ? `/${movie?.id}` : '/'} key={movie?.id} className="flex gap-2 h-40">
+                  <Link href={`/${movie?.id}`} key={movie?.id} className="flex gap-2 h-40">
                     <Image src={`https://image.tmdb.org/t/p/original/${movie?.poster_path}`} height={100} width={120} className="rounded-md object-cover" alt="movie" />
                     <div className="flex flex-col justify-evenly w-3/4">
                       <h2 className="font-bold">{movie?.title}</h2>
@@ -156,7 +149,7 @@ export default function Home() {
           </article>
         </div>
       </main>
-      <Footer page={'home'} />
+      <Footer page={'home'} token={searchParams.get('request_token') || searchParams.get('userID')}/>
     </div>
   )
 }

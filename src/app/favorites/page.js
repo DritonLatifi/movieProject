@@ -12,9 +12,13 @@ import { FaClock } from "react-icons/fa6"
 
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { useRouter, useSearchParams } from "next/navigation"
 
 export default function Home() {
-    if (!window.localStorage.getItem('userID')) window.location.href = '/login' 
+    const router = useRouter()
+    const searchParams = useSearchParams()
+    console.log(searchParams.get('userID'));
+    if (searchParams.get('userID') == 'null' || searchParams.get('userID') == 'undefined') router.push('/login') 
 
     const [favorites, setFavorites] = useState([])
     const [loader, setLoader] = useState(false)
@@ -22,20 +26,7 @@ export default function Home() {
 
     useEffect(() => {
         (async () => {
-            if (!window.localStorage.getItem('userID')) {
-                const res = await fetch('https://api.themoviedb.org/3/authentication/token/new', {
-                    method: 'GET',
-                    headers: {
-                        Authorization: 'Bearer ' + process.env.NEXT_PUBLIC_API_KEY
-                    }
-                })
-                
-                const { request_token } = await res.json()
-
-                window.location.href = `https://www.themoviedb.org/authenticate/${request_token}?redirect_to=http://localhost:3000/`
-            }
-
-            const favoriteRes = await fetch(`https://api.themoviedb.org/3/account/${window.localStorage.getItem('userID')}/favorite/movies?language=en-US&page=1&sort_by=created_at.asc`, {
+            const favoriteRes = await fetch(`https://api.themoviedb.org/3/account/${searchParams.get('userID')}/favorite/movies?language=en-US&page=1&sort_by=created_at.asc`, {
                 method: 'GET',
                 headers: {
                     accept: 'application/json',
@@ -49,7 +40,7 @@ export default function Home() {
 
     function removeHandler(e) {
         (async () => {
-            await fetch(`https://api.themoviedb.org/3/account/${window.localStorage.getItem('userID')}/favorite`, {
+            await fetch(`https://api.themoviedb.org/3/account/${searchParams.get('userID')}/favorite`, {
                 method: 'POST',
                 headers: {
                     accept: 'application/json',
@@ -102,7 +93,7 @@ export default function Home() {
                     )
                 })}
             </main>
-            <Footer page={'favorites'} />
+            <Footer page={'favorites'} token={searchParams.get('userID')} />
             <ToastContainer />
         </div>
     )

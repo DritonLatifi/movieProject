@@ -18,7 +18,7 @@ export default function Home() {
             
             const { request_token } = await res.json()
 
-            router.push(`https://www.themoviedb.org/authenticate/${request_token}?redirect_to=http://localhost:3000/`)
+            router.push(`https://www.themoviedb.org/authenticate/${request_token}?redirect_to=${window.location.host == 'localhost:3000' ? 'http://' : 'https://'}${window.location.host}`)
         })()
     }, [])
 

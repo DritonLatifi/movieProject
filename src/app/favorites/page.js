@@ -7,7 +7,7 @@ import Rating from "@/components/rating"
 import Image from 'next/image'
 import Toggle from "@/components/toggle"
 
-import { useEffect, useRef, useState } from "react"
+import { Suspense, useEffect, useRef, useState } from "react"
 import { FaClock } from "react-icons/fa6"
 
 import { ToastContainer, toast } from 'react-toastify'
@@ -93,7 +93,9 @@ export default function Home() {
                     )
                 })}
             </main>
-            <Footer page={'favorites'} token={searchParams.get('userID')} />
+            <Suspense>
+                <Footer page={'favorites'} token={searchParams.get('userID')} />
+            </Suspense>
             <ToastContainer />
         </div>
     )

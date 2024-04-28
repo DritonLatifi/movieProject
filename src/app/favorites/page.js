@@ -18,7 +18,7 @@ export default function Home() {
     const router = useRouter()
     const searchParams = useSearchParams()
 
-    if (searchParams.get('userID') == 'null' || searchParams.get('userID') == 'undefined') router.push('/login') 
+    if (searchParams.get('userID') == 'null' || searchParams.get('userID') == 'undefined') router.push('/login')
 
     const [favorites, setFavorites] = useState([])
     const [loader, setLoader] = useState(false)
@@ -93,9 +93,7 @@ export default function Home() {
                     )
                 })}
             </main>
-            <Suspense>
-                <Footer page={'favorites'} token={searchParams.get('userID')} />
-            </Suspense>
+            <Footer page={'favorites'} token={searchParams.get('userID')} />
             <ToastContainer />
         </div>
     )
